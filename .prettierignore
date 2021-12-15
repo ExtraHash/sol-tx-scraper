@@ -1,0 +1,8 @@
+node_modules
+./dist
+dist
+**/*.log
+.env
+fullmetadata.json
+exchanges.json
+mintids.json
