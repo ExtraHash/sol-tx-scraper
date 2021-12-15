@@ -6,7 +6,7 @@ import { exchangeWallets } from "./constants/exchangeDetails";
 import { ExchangeDetails } from "./types";
 import sizeof from "object-sizeof";
 
-// set up the discord client and sol rpc
+// set up the sol rpc
 const connection = new Connection(SOL_RPC_URI);
 
 // program entry
@@ -21,13 +21,17 @@ async function main() {
 
 // monitor transactions loop
 async function monitorTransactions(exchange: ExchangeDetails) {
+    // this is the last known signature
     let lastSeen: string | undefined;
+
     log.info(
         "Fetching transactions every five seconds from " + exchange.address
     );
 
     while (true) {
         try {
+            /* fetch signatures more recent than the last one known
+            the first fetch will fetch 1000 transactions */
             const res: any = await connection.getSignaturesForAddress(
                 exchange.address,
                 {
@@ -35,6 +39,7 @@ async function monitorTransactions(exchange: ExchangeDetails) {
                 }
             );
 
+            // sometimes it returns no signatures (empty array)
             if (res.length > 0) {
                 log.info("Scraped " + res.length + " transactions.");
                 log.info(
